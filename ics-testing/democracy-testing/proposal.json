@@ -1,0 +1,12 @@
+{
+  "title": "Slashing Param Change",
+  "description": "Update downtime_jail_duration",
+  "changes": [
+    {
+      "subspace": "slashing",
+      "key": "DowntimeJailDuration",
+      "value": "500000000000"
+    }
+  ],
+  "deposit": "10000000dinar"
+}

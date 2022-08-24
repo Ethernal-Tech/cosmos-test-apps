@@ -42,10 +42,9 @@ func broadcastTx() error {
 	priv1 := secp256k1.GenPrivKeyFromSecret([]byte(seed)) // gives the following address: wasm1rr6wy72cc8u8ges9rjvjx4vrnena5mjxhqp0p4
 
 	// TODO: use one of this or add new message types if needed
-	msg := CreateMsgSubmitEvidence(priv1)
+	//msg := CreateMsgSubmitEvidence(priv1)
 	// msg := CreateMsgUnjail(priv1)
-	// valAddr, _ := sdk.ValAddressFromBech32("wasmvaloper1cj2yuj3nkcgrzweknt5w9qudegmkxfl8hz94s2")
-	// msg := CreateMsgDelegate(genAddr, valAddr)
+	msg := CreateMsgDelegate(priv1)
 
 	err := txBuilder.SetMsgs(msg)
 	if err != nil {
@@ -123,7 +122,7 @@ func broadcastTx() error {
 	// BROADCASTING TRANSACTION------------------------------------------------------------------------------------
 
 	// Create a connection to the gRPC server.
-	grpcConn, err := grpc.Dial(
+	grpcConn, _ := grpc.Dial(
 		"localhost:9081",    // Or your gRPC server address.
 		grpc.WithInsecure(), // The Cosmos SDK doesn't support any transport security mechanism.
 	)
@@ -167,7 +166,9 @@ func CreateMsgSubmitEvidence(priv1 *secp256k1.PrivKey) sdk.Msg {
 	return msg
 }
 
-func CreateMsgDelegate(accAddr sdk.AccAddress, valAddr sdk.ValAddress) sdk.Msg {
+func CreateMsgDelegate(priv1 *secp256k1.PrivKey) sdk.Msg {
+	accAddr := sdk.AccAddress(priv1.PubKey().Address())
+	valAddr := sdk.ValAddress(priv1.PubKey().Address())
 	msg := stakingtypes.NewMsgDelegate(accAddr, valAddr, sdk.NewCoin("stake", sdk.NewInt(150)))
 
 	return msg
