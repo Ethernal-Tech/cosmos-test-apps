@@ -1,8 +1,6 @@
 #!/bin/bash
 set -eux
 
-# bash temp_start_consumer.sh 
-
 CONSUMER_HOME="$HOME/.interchain-security-cd"
 CONSUMER_HOME1="$HOME/.interchain-security-cd1"
 PROVIDER_CHAIN_ID="provider"
@@ -55,7 +53,7 @@ jq -s '.[0].app_state.ccvconsumer = .[1] | .[0]' "$CONSUMER_HOME"/config/genesis
 	mv "$CONSUMER_HOME"/genesis_consumer.json "$CONSUMER_HOME"/config/genesis.json
 
 # Modify genesis params
-jq ".app_state.gov.voting_params.voting_period = \"180s\" | .app_state.staking.params.unbonding_time = \"800s\" | .app_state.crisis.constant_fee.denom =\"dinar\" | .app_state.gov.deposit_params.min_deposit[0].denom =\"dinar\" | .app_state.mint.params.mint_denom =\"dinar\" | .app_state.staking.params.bond_denom =\"dinar\" | .app_state.ccvconsumer.params.blocks_per_distribution_transmission = \"100000\" | .app_state.slashing.params.signed_blocks_window =\"50\"" \
+jq ".app_state.gov.voting_params.voting_period = \"180s\" | .app_state.staking.params.unbonding_time = \"800s\" | .app_state.crisis.constant_fee.denom =\"dinar\" | .app_state.gov.deposit_params.min_deposit[0].denom =\"dinar\" | .app_state.mint.params.mint_denom =\"dinar\" | .app_state.staking.params.bond_denom =\"dinar\" | .app_state.ccvconsumer.params.blocks_per_distribution_transmission = \"70\" | .app_state.slashing.params.signed_blocks_window =\"50\"" \
   $CONSUMER_HOME/config/genesis.json > \
    $CONSUMER_HOME/edited_genesis.json && mv $CONSUMER_HOME/edited_genesis.json $CONSUMER_HOME/config/genesis.json
 sleep 1
@@ -205,6 +203,14 @@ hermes create connection $CONSUMER_CHAIN_ID --client-a 07-tendermint-0 --client-
 hermes create channel $CONSUMER_CHAIN_ID --port-a consumer --port-b provider -o ordered --channel-version 1 connection-0
 
 sleep 5
+
+# Complete handshake for transfer port that is used for rewards distribution from consumer to provider chain (init is called on consumer chain in OnChanOpenAck() during provider-consumer channel handshake)
+TRANSFER_PORT="transfer"
+hermes tx raw chan-open-try --src-chan-id channel-1 $PROVIDER_CHAIN_ID $CONSUMER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
+hermes tx raw chan-open-ack --dst-chan-id channel-1 --src-chan-id channel-1 $CONSUMER_CHAIN_ID $PROVIDER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
+hermes tx raw chan-open-confirm --dst-chan-id channel-1 --src-chan-id channel-1 $PROVIDER_CHAIN_ID $CONSUMER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
+
+sleep 1
 
 hermes -j start &> ~/.hermes/logs &
 
