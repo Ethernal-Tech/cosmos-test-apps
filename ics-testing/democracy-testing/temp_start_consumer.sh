@@ -135,10 +135,10 @@ refresh = true
 misbehaviour = true
 
 [mode.connections]
-enabled = false
+enabled = true
 
 [mode.channels]
-enabled = false
+enabled = true
 
 [mode.packets]
 enabled = true
@@ -205,10 +205,10 @@ hermes create channel $CONSUMER_CHAIN_ID --port-a consumer --port-b provider -o 
 sleep 5
 
 # Complete handshake for transfer port that is used for rewards distribution from consumer to provider chain (init is called on consumer chain in OnChanOpenAck() during provider-consumer channel handshake)
-TRANSFER_PORT="transfer"
-hermes tx raw chan-open-try --src-chan-id channel-1 $PROVIDER_CHAIN_ID $CONSUMER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
-hermes tx raw chan-open-ack --dst-chan-id channel-1 --src-chan-id channel-1 $CONSUMER_CHAIN_ID $PROVIDER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
-hermes tx raw chan-open-confirm --dst-chan-id channel-1 --src-chan-id channel-1 $PROVIDER_CHAIN_ID $CONSUMER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
+# TRANSFER_PORT="transfer"
+# hermes tx raw chan-open-try --src-chan-id channel-1 $PROVIDER_CHAIN_ID $CONSUMER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
+# hermes tx raw chan-open-ack --dst-chan-id channel-1 --src-chan-id channel-1 $CONSUMER_CHAIN_ID $PROVIDER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
+# hermes tx raw chan-open-confirm --dst-chan-id channel-1 --src-chan-id channel-1 $PROVIDER_CHAIN_ID $CONSUMER_CHAIN_ID connection-0 $TRANSFER_PORT $TRANSFER_PORT
 
 sleep 1
 
